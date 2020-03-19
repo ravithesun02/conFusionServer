@@ -30,7 +30,64 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('12345-abcde-23487-abxcv'));
+
+
+function auth(req,res,next){
+
+  if(!req.signedCookies.user)
+  {
+        const authHeader=req.headers.authorization;
+
+        if(!authHeader)
+        {
+          var err=new Error('You are not authenticated');
+          res.setHeader('WWW-Authenticate','Basic');
+          err.status=401;
+          return  next(err);
+        }
+
+        var auth=new Buffer(authHeader.split(' ')[1],'base64').toString().split(':');
+
+        var user=auth[0];
+        var password=auth[1];
+
+        // console.log(password);
+
+        if(user==='admin' && password==='password')
+        {
+          res.cookie('user','admin',{signed:true});
+          next();
+        }
+          
+        else
+        {
+          var err=new Error('You are not authenticated');
+
+          res.setHeader('WWW-authenticate','Basic');
+          err.status=401;
+          return  next(err);
+        }
+  
+  }
+  else
+  {
+    if(req.signedCookies.user==='admin')
+        next();
+    else
+    {
+      
+      var err=new Error('You are not authenticated');
+      err.status=401;
+      return  next(err);
+    }
+  }
+
+  
+}
+
+app.use(auth);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
