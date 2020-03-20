@@ -2,6 +2,8 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var session=require('express-session');
+var fileStore=require('session-file-store')(session);
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
@@ -30,12 +32,22 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser('12345-abcde-23487-abxcv'));
+//app.use(cookieParser('12345-abcde-23487-abxcv'));
 
+
+app.use(session({
+  name:'session-id',
+  secret:'12345-abcde-23487-abxcv',
+  saveUninitialized:false,
+  resave:false,
+  store:new fileStore()
+}));
 
 function auth(req,res,next){
 
-  if(!req.signedCookies.user)
+  console.log(req.session);
+
+  if(!req.session.user)
   {
         const authHeader=req.headers.authorization;
 
@@ -56,7 +68,7 @@ function auth(req,res,next){
 
         if(user==='admin' && password==='password')
         {
-          res.cookie('user','admin',{signed:true});
+          req.session.user='admin';
           next();
         }
           
@@ -72,7 +84,7 @@ function auth(req,res,next){
   }
   else
   {
-    if(req.signedCookies.user==='admin')
+    if(req.session.user==='admin')
         next();
     else
     {
