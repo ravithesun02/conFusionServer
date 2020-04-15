@@ -5,6 +5,8 @@ const leaderRouter=express.Router();
 
 const Leader=require('../models/leaders');
 
+var authenticate=require('../authenticate');
+
 leaderRouter.use(bodyparser.json());
 
 leaderRouter.route('/')
@@ -17,7 +19,7 @@ leaderRouter.route('/')
    },(err)=>console.log(err))
    .catch((err)=>next(err))
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     Leader.create(req.body)
     .then((leaders)=>{
         res.statusCode=200;
@@ -26,12 +28,12 @@ leaderRouter.route('/')
     },(err)=>console.log(err))
     .catch((err)=>next(err))
 })
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;
     res.end('Put is not allowed on /leaders');
 })
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
    Leader.remove({})
    .then((resp)=>{
        res.statusCode=200;
@@ -61,11 +63,11 @@ leaderRouter.route('/:leaderId')
     },(err)=>console.log(err))
     .catch((err)=>next(err))
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;
     res.end('Not allowed ');
 })
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
    Leader.findByIdAndUpdate(req.params.leaderId,req.body)
    .then((leader)=>{
        res.statusCode=200;
@@ -75,7 +77,7 @@ leaderRouter.route('/:leaderId')
    .catch((err)=>next(err))
 })
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
    Leader.findByIdAndRemove(req.params.leaderId)
    .then((resp)=>{
        res.statusCode=200;

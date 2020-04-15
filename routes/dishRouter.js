@@ -5,6 +5,8 @@ const mongoose=require('mongoose');
 
 const Dishes=require('../models/dishes');
 
+var authenticate=require('../authenticate');
+
 const dishRouter=express.Router();
 
 dishRouter.use(bodyparser.json());
@@ -19,7 +21,7 @@ dishRouter.route('/')
     },(err)=>{console.log(err)})
     .catch((err)=>{ next(err) })
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     Dishes.create(req.body)
     .then((dish)=>{
         console.log(dish);
@@ -29,13 +31,13 @@ dishRouter.route('/')
     },(err)=>{console.log(err)})
     .catch((err)=>{next(err)})
 })
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;
     res.setHeader('Content-Type','text/plain');
     res.end('Put is not allowed');
 })
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
     Dishes.remove({})
     .then((resp)=>{
         res.statusCode=200;
@@ -55,12 +57,12 @@ dishRouter.route('/:dishId')
     },(err)=>{console.log(err)})
     .catch((err)=>{next(err)})
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=200;
     res.setHeader('Content-Type','text/plain');
     res.end('post method call Not allowed');
 })
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     Dishes.findByIdAndUpdate(req.params.dishId,req.body,{new:true})
     .then((dish)=>{
         res.statusCode=200;
@@ -70,7 +72,7 @@ dishRouter.route('/:dishId')
     
 })
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
    Dishes.findByIdAndRemove(req.paramas.dishId)
    .then((resp)=>{
        res.statusCode=200;
@@ -104,7 +106,7 @@ dishRouter.route('/:dishId/comments')
         next(err);
     })
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     Dishes.findById(req.params.dishId)
     .then((dish)=>{
         if(dish!=null)
@@ -127,12 +129,12 @@ dishRouter.route('/:dishId/comments')
     .catch((err)=>next(err))
 })
 
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;
     res.end('Update is not supported for comments section with Id'+req.params.dishId);
 })
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
     Dishes.findById(req.params.dishId)
     .then((dish)=>{
         if(dish!=null)
@@ -185,12 +187,12 @@ dishRouter.route('/:dishId/comments/:commentId')
     .catch((err)=>next(err))
 })
 
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;
     res.end('Post is not allowed on comment with Id '+req.params.commentId);
 })
 
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     Dishes.findById(req.params.dishId)
     .then((dish)=>{
         if(dish!=null && dish.comments.id(req.params.commentId)!=null)
@@ -223,7 +225,7 @@ dishRouter.route('/:dishId/comments/:commentId')
     .catch((err)=>next(err))
 })
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
     Dishes.findById(req.params.dishId)
     .then((dish)=>{
         if(dish!=null && dish.comments.id(req.params.commentId)!=null)

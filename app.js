@@ -13,10 +13,12 @@ var dishRouter=require('./routes/dishRouter');
 var promoRouter=require('./routes/promoRouter');
 var leaderRouter=require('./routes/leaderRouter');
 
+var config=require('./config');
+
 
 const mongoose=require('mongoose');
 
-const url="mongodb://localhost:27017/conFusion";
+const url=config.mongoUrl;
 
 const connect=mongoose.connect(url,{ useNewUrlParser: true });
 
@@ -36,39 +38,39 @@ app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-abcde-23487-abxcv'));
 
 
-app.use(session({
-  name:'session-id',
-  secret:'12345-abcde-23487-abxcv',
-  saveUninitialized:false,
-  resave:false,
-  store:new fileStore()
-}));
+// app.use(session({
+//   name:'session-id',
+//   secret:'12345-abcde-23487-abxcv',
+//   saveUninitialized:false,
+//   resave:false,
+//   store:new fileStore()
+// }));
 
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-function auth(req,res,next){
+// function auth(req,res,next){
 
-  console.log(req.session);
+//   console.log(req.session);
 
-  if(!req.user)
-  {
-          var err=new Error('You are not authenticated');
-          err.status=401;
-          return  next(err);  
-  }
-  else
-  {
-        next();
-  }
+//   if(!req.user)
+//   {
+//           var err=new Error('You are not authenticated');
+//           err.status=401;
+//           return  next(err);  
+//   }
+//   else
+//   {
+//         next();
+//   }
 
   
-}
+// }
 
-app.use(auth);
+// app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
