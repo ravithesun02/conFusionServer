@@ -19,7 +19,7 @@ promoRouter.route('/')
    },(err)=>console.log(err))
    .catch((err)=>next(err))
 })
-.post(authenticate.verifyUser,(req,res,next)=>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
    Promotions.create(req.body)
    .then((promos)=>{
     res.statusCode=200;
@@ -28,13 +28,13 @@ promoRouter.route('/')
 },(err)=>console.log(err))
 .catch((err)=>next(err))
 })
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     res.statusCode=403;
     res.setHeader('Content-Type','text/plain');
     res.end('Put is not allowed');
 })
 
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.remove({})
     .then((resp)=>{
         res.statusCode=200;
@@ -62,11 +62,11 @@ promoRouter.route('/:promoId')
     },(err)=>console.log(err))
     .catch((err)=>next(err))
 })
-.post(authenticate.verifyUser,(req,res,next)=>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     res.statusCode=403;
     res.end('Post method is not allowed On each promotions');
 })
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.findByIdAndUpdate(req.params.promoId,req.body)
     .then((promo)=>{
         res.statusCode=200;
@@ -77,7 +77,7 @@ promoRouter.route('/:promoId')
     .catch((err)=>next(err))
 })
 
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.findByIdAndRemove(req.params.promoId)
     .then((resp)=>{
         res.statusCode=200;
