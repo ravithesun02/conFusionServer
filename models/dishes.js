@@ -15,8 +15,8 @@ var commentScema=new Schema({
         max:5
     },
     author:{
-        type:String,
-        required:true
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
     },
     comment:{
         type:String,
