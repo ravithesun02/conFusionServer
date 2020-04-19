@@ -4,6 +4,7 @@ const authenticate=require('../authenticate');
 const multer=require('multer');
 
 const uploadRouter=express.Router();
+var cors=require('./cors');
 
 uploadRouter.use(bodyparser.json());
 
@@ -29,22 +30,23 @@ const upload=multer({
 });
 
 uploadRouter.route('/')
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>res.sendStatus(200))
+.get(cors.cors,(req,res,next)=>{
     res.statusCode=403;
     res.setHeader('Content-Type','text/plain');
     res.end('GET is not allowed');
 })
-.post(authenticate.verifyUser,authenticate.verifyAdmin,upload.single('imageFile'),(req,res)=>{
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,upload.single('imageFile'),(req,res)=>{
     res.statusCode=200;
     res.setHeader('Content-Type','application/json');
     res.json(req.file);
 })
-.put((req,res,next)=>{
+.put(cors.corsWithOptions,(req,res,next)=>{
     res.statusCode=403;
     res.setHeader('Content-Type','text/plain');
     res.end('PUT is not allowed');
 })
-.delete((req,res,next)=>{
+.delete(cors.corsWithOptions,(req,res,next)=>{
     res.statusCode=403;
     res.setHeader('Content-Type','text/plain');
     res.end('DELETE is not allowed');

@@ -6,11 +6,13 @@ const promoRouter=express.Router();
 const Promotions=require('../models/promotions');
 
 var authenticate=require('../authenticate');
+var cors=require('./cors');
 
 promoRouter.use(bodyparser.json());
 
 promoRouter.route('/')
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>res.sendStatus(200))
+.get(cors.cors,(req,res,next)=>{
    Promotions.find({})
    .then((promos)=>{
        res.statusCode=200;
@@ -19,7 +21,7 @@ promoRouter.route('/')
    },(err)=>console.log(err))
    .catch((err)=>next(err))
 })
-.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
    Promotions.create(req.body)
    .then((promos)=>{
     res.statusCode=200;
@@ -34,7 +36,7 @@ promoRouter.route('/')
     res.end('Put is not allowed');
 })
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.remove({})
     .then((resp)=>{
         res.statusCode=200;
@@ -46,7 +48,8 @@ promoRouter.route('/')
 
 promoRouter.route('/:promoId')
 
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>res.sendStatus(200))
+.get(cors.cors,(req,res,next)=>{
     Promotions.findById(req.params.promoId)
     .then((promo)=>{
         if(promo!=null)
@@ -62,11 +65,11 @@ promoRouter.route('/:promoId')
     },(err)=>console.log(err))
     .catch((err)=>next(err))
 })
-.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     res.statusCode=403;
     res.end('Post method is not allowed On each promotions');
 })
-.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.findByIdAndUpdate(req.params.promoId,req.body)
     .then((promo)=>{
         res.statusCode=200;
@@ -77,7 +80,7 @@ promoRouter.route('/:promoId')
     .catch((err)=>next(err))
 })
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.findByIdAndRemove(req.params.promoId)
     .then((resp)=>{
         res.statusCode=200;
